@@ -54,6 +54,7 @@ func TestScanner(t *testing.T) {
 		{`+$`, "+$ EOF"},
 		{`(first (list 1 (+ 2 3) 9))`, "( first whitespace ( list whitespace 1 whitespace ( + whitespace 2 whitespace 3 ) whitespace 9 ) ) EOF"},
 		{"(1e-1 1e1)\n(x 2 \"3\")", "( 1.000000e-01 whitespace 1.000000e+01 ) newline ( x whitespace 2 whitespace \"3\" ) EOF"},
+		{`(+ 1.4 5.0)`, "( + whitespace 1.400000e+00 whitespace 5.000000e+00 ) EOF"},
 	} {
 
 		got, err := scan(test.input)

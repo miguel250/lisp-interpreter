@@ -261,6 +261,11 @@ func (sc *scanner) scanNumber(val *value, c rune) (*value, token) {
 		sc.next() // consume dot
 		c = sc.next()
 		for isdigit(c) {
+			// Make sure we don't cosume a closing parenthese, spaces or tabs.
+			if next := sc.peek(); next == ')' || next == ' ' || next == '\t' {
+				break
+			}
+
 			sc.next()
 			c = sc.peek()
 		}

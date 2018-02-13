@@ -17,6 +17,7 @@ func TestParser(t *testing.T) {
 		{`(1 (2 3) ())`, "(cons 1 (cons (cons 2 (cons 3 nil)) (cons nil nil)))"},
 		{`(setq c (list 1.4 "1" 3))`, "(cons setq (cons c (cons (cons list (cons 1.4 (cons \"1\" (cons 3 nil)))) nil)))"},
 		{`(())`, "(cons nil nil)"},
+		{`(+ 1.4 5.0)`, "(cons + (cons 1.4 (cons 5 nil)))"},
 	} {
 		expr, err := parse(test.input)
 
