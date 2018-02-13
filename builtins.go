@@ -27,7 +27,7 @@ func newBuiltins() *builtins {
 	b.add("print", builtinPrint)
 	b.add("list", builtinList)
 	b.add("first", builtinFirst)
-
+	b.add("+", builtinAdd)
 	return b
 }
 
@@ -143,6 +143,57 @@ func builtinFirst(s *scope, ss []sexpr) (sexpr, error) {
 		return nil, fmt.Errorf("Unable to convert expression to cons: {%v}", args[0])
 	}
 	return cons.car, nil
+}
+
+// builtinAdd adds two number of the same type together
+func builtinAdd(s *scope, ss []sexpr) (sexpr, error) {
+	if len(ss) < 2 && len(ss) > 2 {
+		return nil, fmt.Errorf("Addition only takes 2 args")
+	}
+
+	args, err := evalArgs(s, ss)
+
+	if err != nil {
+		return nil, err
+	}
+
+	firstArg, ok := args[0].(*atomExpr)
+
+	if !ok {
+		return nil, fmt.Errorf("Failed to add %s", ok)
+	}
+
+	secondArg, ok := args[1].(*atomExpr)
+
+	if !ok {
+		return nil, fmt.Errorf("Failed to add %s", ok)
+	}
+
+	if firstArg.token != secondArg.token {
+		return nil, fmt.Errorf("Arguments have to be the same type got: %s %s", firstArg.token, secondArg.token)
+	}
+
+	var total int64
+	var totalFloat float64
+
+	switch firstArg.token {
+	case INT:
+		total = firstArg.value.(int64) + secondArg.value.(int64)
+	case FLOAT:
+		totalFloat = firstArg.value.(float64) + secondArg.value.(float64)
+	default:
+		return nil, fmt.Errorf("Unsupported type")
+	}
+
+	totalAtom := &atomExpr{}
+	if firstArg.token == INT {
+		totalAtom.value = total
+		totalAtom.token = INT
+	} else {
+		totalAtom.value = totalFloat
+		totalAtom.token = FLOAT
+	}
+	return totalAtom, nil
 }
 
 // evalArgs evaluate all arguments pass to a function when necessary and

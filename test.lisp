@@ -9,3 +9,6 @@
 (setq c (list 1.4 "1" 3))
 (setq r (list 4 1 c))
 (print r)
+(setq add (+ 5 10))
+(print add)
+
