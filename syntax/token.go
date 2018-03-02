@@ -1,22 +1,38 @@
 package syntax
 
-// token holds all tokens to be parse.
+// Token holds all tokens to be parse.
 type Token int8
 
 const (
-	EOF Token = iota
+	// EOF presents the end of a file
+	EOF token = iota
+
+	// INVALID token
 	INVALID
 
+	// NEWLINE \n
 	NEWLINE
+
+	// WHITESPACE mark with \t or \s
 	WHITESPACE
 
+	// SYMBOL (list 1 2 3)
 	SYMBOL
+
+	// INT atom
 	INT
+
+	// FLOAT atom
 	FLOAT
+
+	// STRING atom
 	STRING
 
-	LPAREN // (
-	RPAREN // )
+	// LPAREN (
+	LPAREN
+
+	// RPAREN )
+	RPAREN
 )
 
 func (t Token) String() string {

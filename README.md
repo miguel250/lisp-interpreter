@@ -1,4 +1,4 @@
-# Lisp Interpreter
+# Lisp Interpreter [![Build Status](https://travis-ci.org/miguel250/lisp-interpreter.svg?branch=master)](https://travis-ci.org/miguel250/lisp-interpreter)
 
 #### Build and run
 ```bash

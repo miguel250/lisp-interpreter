@@ -32,12 +32,12 @@ func (s *Scope) String() string {
 	return buf.String()
 }
 
-// set adds a symbol and s-expression into the scope.
+// Set adds a symbol and s-expression into the scope.
 func (s *Scope) Set(symbol syntax.SymbolExpr, expr syntax.Sexpr) {
 	s.data[symbol] = expr
 }
 
-// get returns a s-expression from a symbol.
+// Get returns a s-expression from a symbol.
 func (s *Scope) Get(symbol syntax.SymbolExpr) (syntax.Sexpr, error) {
 	v, ok := s.data[symbol]
 
@@ -56,16 +56,16 @@ func (s *Scope) Get(symbol syntax.SymbolExpr) (syntax.Sexpr, error) {
 	return nil, fmt.Errorf("Symbol not found in scope: {%s}", symbol.Name)
 }
 
-// function is a function to be added to the scope and make it accessible to be called.
+// Function is a function to be added to the scope and make it accessible to be called.
 type Function func(*Scope, []syntax.Sexpr) (syntax.Sexpr, error)
 
-// A funcExpr represent a callable function s-expression.
+// A FuncExpr represent a callable function s-expression.
 type FuncExpr struct {
 	Name string
 	Fn   Function
 }
 
-func (*FuncExpr) Expr() {}
+func (*FuncExpr) expr() {}
 func (f FuncExpr) String() string {
 	return fmt.Sprintf("fn: %s", f.Name)
 }

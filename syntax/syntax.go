@@ -5,52 +5,52 @@ import (
 	"fmt"
 )
 
-// sexpr is a S-expression
+// Sexpr is a S-expression
 type Sexpr interface {
-	Expr()
+	expr()
 	String() string
 }
 
-// A consExpr is a set of values inside of a
+// A ConsExpr is a set of values inside of a
 // parentheses.
 type ConsExpr struct {
 	Car Sexpr
 	Cdr Sexpr
 }
 
-func (*ConsExpr) Expr() {}
+func (*ConsExpr) expr() {}
 func (c *ConsExpr) String() string {
 	return fmt.Sprintf("(cons %s %s)", c.Car, c.Cdr)
 }
 
-// a nilExpr represent a "nil".
+// A NilExpr represent a "nil".
 type NilExpr struct{}
 
-func (*NilExpr) Expr()          {}
+func (*NilExpr) expr()          {}
 func (*NilExpr) String() string { return "nil" }
 
-// A symbolExpr represent the name of a symbol to be able
+// A SymbolExpr represent the name of a symbol to be able
 // to access variables.
 type SymbolExpr struct {
 	Token Token
 	Name  string
 }
 
-func (*SymbolExpr) Expr() {}
+func (*SymbolExpr) expr() {}
 func (s *SymbolExpr) String() string {
 	var buf bytes.Buffer
 	buf.WriteString(s.Name)
 	return buf.String()
 }
 
-// An atomExpr represent all variables types.
+// An AtomExpr represent all variables types.
 type AtomExpr struct {
 	Token Token
 	Raw   string
 	Value interface{}
 }
 
-func (*AtomExpr) Expr() {}
+func (*AtomExpr) expr() {}
 func (a *AtomExpr) String() string {
 	var buf bytes.Buffer
 

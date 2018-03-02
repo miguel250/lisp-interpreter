@@ -12,19 +12,35 @@ import (
 type token int8
 
 const (
+	// EOF presents the end of a file
 	EOF token = iota
+
+	// INVALID token
 	INVALID
 
+	// NEWLINE \n
 	NEWLINE
+
+	// WHITESPACE mark with \t or \s
 	WHITESPACE
 
+	// SYMBOL (list 1 2 3)
 	SYMBOL
+
+	// INT atom
 	INT
+
+	// FLOAT atom
 	FLOAT
+
+	// STRING atom
 	STRING
 
-	LPAREN // (
-	RPAREN // )
+	// LPAREN (
+	LPAREN
+
+	// RPAREN )
+	RPAREN
 )
 
 func (t token) String() string {
@@ -86,7 +102,7 @@ type value struct {
 func (sc *scanner) nextToken() (*value, token) {
 	var (
 		c   rune
-		val *value = new(value)
+		val = new(value)
 	)
 
 	c = sc.peek()
