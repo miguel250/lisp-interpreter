@@ -16,8 +16,8 @@ type builtins struct {
 
 // add new function to builtins internal map.
 func (b *builtins) add(name string, fn scope.Function) {
-	s := syntax.SymbolExpr{syntax.SYMBOL, name}
-	f := scope.FuncExpr{name, fn}
+	s := syntax.SymbolExpr{Token: syntax.SYMBOL, Name: name}
+	f := scope.FuncExpr{Name: name, Fn: fn}
 	b.fn[s] = &f
 }
 
@@ -122,7 +122,7 @@ func builtinList(s *scope.Scope, ss []syntax.Sexpr) (syntax.Sexpr, error) {
 	expr = &syntax.NilExpr{}
 
 	for i := len(ss) - 1; i >= 0; i-- {
-		expr = &syntax.ConsExpr{ss[i], expr}
+		expr = &syntax.ConsExpr{Car: ss[i], Cdr: expr}
 	}
 
 	return expr, nil

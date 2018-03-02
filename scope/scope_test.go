@@ -16,17 +16,17 @@ type testScope struct {
 func TestScope(t *testing.T) {
 	for _, test := range []testScope{
 		{
-			syntax.SymbolExpr{syntax.SYMBOL, "x"},
-			syntax.AtomExpr{syntax.INT, "2", 2},
+			syntax.SymbolExpr{Token: syntax.SYMBOL, Name: "x"},
+			syntax.AtomExpr{Token: syntax.INT, Raw: "2", Value: 2},
 			nil,
 			"data: map[{4 x}:atom(2)]",
 		},
 		{
-			syntax.SymbolExpr{syntax.SYMBOL, "z"},
-			syntax.AtomExpr{syntax.STRING, "hello", "hello"},
+			syntax.SymbolExpr{Token: syntax.SYMBOL, Name: "z"},
+			syntax.AtomExpr{Token: syntax.STRING, Raw: "hello", Value: "hello"},
 			&testScope{
-				syntax.SymbolExpr{syntax.SYMBOL, "x"},
-				syntax.AtomExpr{syntax.INT, "2", 2},
+				syntax.SymbolExpr{Token: syntax.SYMBOL, Name: "x"},
+				syntax.AtomExpr{Token: syntax.INT, Raw: "2", Value: 2},
 				nil,
 				"",
 			},
