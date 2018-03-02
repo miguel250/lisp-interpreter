@@ -5,17 +5,19 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/miguel250/lisp-interpreter/scope"
 )
 
 func main() {
 	replPtr := flag.Bool("r", false, "REPL mode")
 	flag.Parse()
 
-	scope := newScope(nil)
+	scope := scope.NewScope(nil)
 	b := newBuiltins()
 
 	for k, v := range b.fn {
-		scope.set(k, v)
+		scope.Set(k, v)
 	}
 
 	repl := *replPtr
@@ -30,7 +32,7 @@ func main() {
 	}
 }
 
-func input(scope *scope, repl bool) {
+func input(scope *scope.Scope, repl bool) {
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {

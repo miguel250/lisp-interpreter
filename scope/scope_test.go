@@ -1,12 +1,14 @@
-package main
+package scope
 
 import (
 	"testing"
+
+	"github.com/miguel250/lisp-interpreter/syntax"
 )
 
 type testScope struct {
-	symbol      symbolExpr
-	atom        atomExpr
+	symbol      syntax.SymbolExpr
+	atom        syntax.AtomExpr
 	parent      *testScope
 	scopeString string
 }
@@ -14,17 +16,17 @@ type testScope struct {
 func TestScope(t *testing.T) {
 	for _, test := range []testScope{
 		{
-			symbolExpr{SYMBOL, "x"},
-			atomExpr{INT, "2", 2},
+			syntax.SymbolExpr{syntax.SYMBOL, "x"},
+			syntax.AtomExpr{syntax.INT, "2", 2},
 			nil,
 			"data: map[{4 x}:atom(2)]",
 		},
 		{
-			symbolExpr{SYMBOL, "z"},
-			atomExpr{STRING, "hello", "hello"},
+			syntax.SymbolExpr{syntax.SYMBOL, "z"},
+			syntax.AtomExpr{syntax.STRING, "hello", "hello"},
 			&testScope{
-				symbolExpr{SYMBOL, "x"},
-				atomExpr{INT, "2", 2},
+				syntax.SymbolExpr{syntax.SYMBOL, "x"},
+				syntax.AtomExpr{syntax.INT, "2", 2},
 				nil,
 				"",
 			},

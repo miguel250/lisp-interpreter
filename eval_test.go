@@ -2,6 +2,8 @@ package main
 
 import (
 	"testing"
+
+	"github.com/miguel250/lisp-interpreter/scope"
 )
 
 func TestEval(t *testing.T) {
@@ -23,11 +25,11 @@ func TestEval(t *testing.T) {
 			t.Fatalf("%s", err)
 		}
 
-		s := newScope(nil)
+		s := scope.NewScope(nil)
 
 		b := newBuiltins()
 		for k, v := range b.fn {
-			s.set(k, v)
+			s.Set(k, v)
 		}
 
 		e, err := eval(expr[0], s)

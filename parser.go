@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/miguel250/lisp-interpreter/syntax"
 )
 
 // parser hold a instance of the scanner as well as
@@ -14,7 +16,7 @@ type parser struct {
 
 // parse takes a input and passes to the scanner then
 // it parses all the tokens return by the scanner.
-func parse(src interface{}) (ss []sexpr, err error) {
+func parse(src interface{}) (ss []syntax.Sexpr, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("%v", r)
@@ -39,7 +41,7 @@ func (p *parser) nextToken() {
 
 // parseNext parses the next token return by the scanner
 // and return a s-expression for a given token.
-func (p *parser) parseNext() (expr sexpr) {
+func (p *parser) parseNext() (expr syntax.Sexpr) {
 
 	switch p.tokenName {
 	case SYMBOL:
@@ -75,27 +77,27 @@ func (p *parser) consume(tok token) {
 
 // parseSymbol parses a symbol by wrapping it in a
 // symbolExpr struct then returns a s-expression.
-func (p *parser) parseSymbol() sexpr {
+func (p *parser) parseSymbol() syntax.Sexpr {
 	tok := p.tokenName
 	name := p.tokenValue.raw
 	p.nextToken()
 
 	p.consume(WHITESPACE)
 
-	return &symbolExpr{
-		token: tok,
-		name:  name,
+	return &syntax.SymbolExpr{
+		Token: syntax.Token(tok),
+		Name:  name,
 	}
 }
 
 // parseCons parses everything inside of
 // the parentheses then returning a consExpr as
 // s-expression interface
-func (p *parser) parseCons() sexpr {
+func (p *parser) parseCons() syntax.Sexpr {
 	tok := p.tokenName
 	if tok == RPAREN {
 		p.nextToken()
-		return &nilExpr{}
+		return &syntax.NilExpr{}
 	}
 
 	car := p.parseNext()
@@ -103,12 +105,12 @@ func (p *parser) parseCons() sexpr {
 
 	p.consume(WHITESPACE)
 
-	return &consExpr{car: car, cdr: cdr}
+	return &syntax.ConsExpr{Car: car, Cdr: cdr}
 }
 
 // parseAtom parses all string, integers and float points
 // wrapped in an atomExpr.
-func (p *parser) parseAtom() sexpr {
+func (p *parser) parseAtom() syntax.Sexpr {
 	var value interface{}
 	tok := p.tokenName
 	raw := p.tokenValue.raw
@@ -125,9 +127,9 @@ func (p *parser) parseAtom() sexpr {
 
 	p.consume(WHITESPACE)
 
-	return &atomExpr{
-		token: tok,
-		raw:   raw,
-		value: value,
+	return &syntax.AtomExpr{
+		Token: syntax.Token(tok),
+		Raw:   raw,
+		Value: value,
 	}
 }

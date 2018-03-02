@@ -321,8 +321,6 @@ func (sc *scanner) scanNumber(val *value, c rune) (*value, token) {
 func isSymbolStart(c rune) bool {
 	return 'a' <= c && c <= 'z' ||
 		'A' <= c && c <= 'Z' ||
-		c == '_' ||
-		c == '*' ||
 		c == '+' ||
 		c == '-' ||
 		c == '*' ||

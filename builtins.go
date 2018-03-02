@@ -4,24 +4,27 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+
+	"github.com/miguel250/lisp-interpreter/scope"
+	"github.com/miguel250/lisp-interpreter/syntax"
 )
 
 // builtins holds all go fuction to make it available at run time.
 type builtins struct {
-	fn map[symbolExpr]sexpr
+	fn map[syntax.SymbolExpr]syntax.Sexpr
 }
 
 // add new function to builtins internal map.
-func (b *builtins) add(name string, fn function) {
-	s := symbolExpr{SYMBOL, name}
-	f := funcExpr{name, fn}
+func (b *builtins) add(name string, fn scope.Function) {
+	s := syntax.SymbolExpr{syntax.SYMBOL, name}
+	f := scope.FuncExpr{name, fn}
 	b.fn[s] = &f
 }
 
 // newBuiltins returns an instance of builtins with all built-in functions
 // added.
 func newBuiltins() *builtins {
-	b := &builtins{fn: make(map[symbolExpr]sexpr)}
+	b := &builtins{fn: make(map[syntax.SymbolExpr]syntax.Sexpr)}
 
 	b.add("setq", builtinSetq)
 	b.add("print", builtinPrint)
@@ -33,23 +36,23 @@ func newBuiltins() *builtins {
 
 // builtinSetq adds a s-expression into scope. It will failed
 // if not enough arguments are pass to it.
-func builtinSetq(s *scope, ss []sexpr) (sexpr, error) {
+func builtinSetq(s *scope.Scope, ss []syntax.Sexpr) (syntax.Sexpr, error) {
 	if len(ss) < 2 {
 		return nil, fmt.Errorf("setq needs two arguments")
 	}
 
-	symbol := ss[0].(*symbolExpr)
+	symbol := ss[0].(*syntax.SymbolExpr)
 	expr, err := eval(ss[1], s)
 	if err != nil {
 		return nil, err
 	}
 
-	s.set(*symbol, expr)
+	s.Set(*symbol, expr)
 	return expr, nil
 }
 
 // builtinPrint prints a s-expression into the stdout.
-func builtinPrint(s *scope, ss []sexpr) (sexpr, error) {
+func builtinPrint(s *scope.Scope, ss []syntax.Sexpr) (syntax.Sexpr, error) {
 	if len(ss) < 1 {
 		return nil, fmt.Errorf("print needs an argument")
 	}
@@ -64,7 +67,7 @@ func builtinPrint(s *scope, ss []sexpr) (sexpr, error) {
 	expr := args[0]
 
 	switch e := expr.(type) {
-	case *consExpr:
+	case *syntax.ConsExpr:
 		formatCons(&buf, e, true)
 	default:
 		fmt.Fprintf(&buf, "%s", expr)
@@ -77,21 +80,21 @@ func builtinPrint(s *scope, ss []sexpr) (sexpr, error) {
 // formatCons formats consExpr in a more readable way only adding parentheses
 // when necessary.
 // ( 4 1 ( 4 1 2 ))
-func formatCons(src io.Writer, cons *consExpr, parenthese bool) {
+func formatCons(src io.Writer, cons *syntax.ConsExpr, parenthese bool) {
 	if parenthese {
 		fmt.Fprint(src, "( ")
 	}
 
 	// car can be a consExpr or atomExpr
-	car, ok := cons.car.(*consExpr)
+	car, ok := cons.Car.(*syntax.ConsExpr)
 
 	if ok {
 		formatCons(src, car, true)
 	} else {
-		fmt.Fprintf(src, "%s ", cons.car)
+		fmt.Fprintf(src, "%s ", cons.Car)
 	}
 
-	cdr, ok := cons.cdr.(*consExpr)
+	cdr, ok := cons.Cdr.(*syntax.ConsExpr)
 	if ok {
 		formatCons(src, cdr, false)
 	}
@@ -104,7 +107,7 @@ func formatCons(src io.Writer, cons *consExpr, parenthese bool) {
 
 // builtinList creates a list by linking a set of const together.
 // (cons 4 (cons 5 (cons 6 nil)))
-func builtinList(s *scope, ss []sexpr) (sexpr, error) {
+func builtinList(s *scope.Scope, ss []syntax.Sexpr) (syntax.Sexpr, error) {
 	if len(ss) < 1 {
 		return nil, fmt.Errorf("list needs an argument")
 	}
@@ -115,18 +118,18 @@ func builtinList(s *scope, ss []sexpr) (sexpr, error) {
 		return nil, err
 	}
 
-	var expr sexpr
-	expr = &nilExpr{}
+	var expr syntax.Sexpr
+	expr = &syntax.NilExpr{}
 
 	for i := len(ss) - 1; i >= 0; i-- {
-		expr = &consExpr{ss[i], expr}
+		expr = &syntax.ConsExpr{ss[i], expr}
 	}
 
 	return expr, nil
 }
 
 // builtinFirst returns the first value of a list (const.car).
-func builtinFirst(s *scope, ss []sexpr) (sexpr, error) {
+func builtinFirst(s *scope.Scope, ss []syntax.Sexpr) (syntax.Sexpr, error) {
 	if len(ss) < 1 {
 		return nil, fmt.Errorf("first needs an argument")
 	}
@@ -137,16 +140,16 @@ func builtinFirst(s *scope, ss []sexpr) (sexpr, error) {
 		return nil, err
 	}
 
-	cons, ok := args[0].(*consExpr)
+	cons, ok := args[0].(*syntax.ConsExpr)
 
 	if !ok {
 		return nil, fmt.Errorf("Unable to convert expression to cons: {%v}", args[0])
 	}
-	return cons.car, nil
+	return cons.Car, nil
 }
 
 // builtinAdd adds two number of the same type together
-func builtinAdd(s *scope, ss []sexpr) (sexpr, error) {
+func builtinAdd(s *scope.Scope, ss []syntax.Sexpr) (syntax.Sexpr, error) {
 	if len(ss) < 2 && len(ss) > 2 {
 		return nil, fmt.Errorf("Addition only takes 2 args")
 	}
@@ -157,49 +160,49 @@ func builtinAdd(s *scope, ss []sexpr) (sexpr, error) {
 		return nil, err
 	}
 
-	firstArg, ok := args[0].(*atomExpr)
+	firstArg, ok := args[0].(*syntax.AtomExpr)
 
 	if !ok {
-		return nil, fmt.Errorf("Failed to add %s", ok)
+		return nil, fmt.Errorf("Failed to add %s", ss)
 	}
 
-	secondArg, ok := args[1].(*atomExpr)
+	secondArg, ok := args[1].(*syntax.AtomExpr)
 
 	if !ok {
-		return nil, fmt.Errorf("Failed to add %s", ok)
+		return nil, fmt.Errorf("Failed to add %s", ss)
 	}
 
-	if firstArg.token != secondArg.token {
-		return nil, fmt.Errorf("Arguments have to be the same type got: %s %s", firstArg.token, secondArg.token)
+	if firstArg.Token != secondArg.Token {
+		return nil, fmt.Errorf("Arguments have to be the same type got: %s %s", firstArg.Token, secondArg.Token)
 	}
 
 	var total int64
 	var totalFloat float64
 
-	switch firstArg.token {
-	case INT:
-		total = firstArg.value.(int64) + secondArg.value.(int64)
-	case FLOAT:
-		totalFloat = firstArg.value.(float64) + secondArg.value.(float64)
+	switch firstArg.Token {
+	case syntax.INT:
+		total = firstArg.Value.(int64) + secondArg.Value.(int64)
+	case syntax.FLOAT:
+		totalFloat = firstArg.Value.(float64) + secondArg.Value.(float64)
 	default:
 		return nil, fmt.Errorf("Unsupported type")
 	}
 
-	totalAtom := &atomExpr{}
-	if firstArg.token == INT {
-		totalAtom.value = total
-		totalAtom.token = INT
+	totalAtom := &syntax.AtomExpr{}
+	if firstArg.Token == syntax.INT {
+		totalAtom.Value = total
+		totalAtom.Token = syntax.INT
 	} else {
-		totalAtom.value = totalFloat
-		totalAtom.token = FLOAT
+		totalAtom.Value = totalFloat
+		totalAtom.Token = syntax.FLOAT
 	}
 	return totalAtom, nil
 }
 
 // evalArgs evaluate all arguments pass to a function when necessary and
 // returns a slice with the s-expressions.
-func evalArgs(s *scope, ss []sexpr) ([]sexpr, error) {
-	args := make([]sexpr, 0, 0)
+func evalArgs(s *scope.Scope, ss []syntax.Sexpr) ([]syntax.Sexpr, error) {
+	args := make([]syntax.Sexpr, 0, 0)
 	for _, e := range ss {
 		e, err := eval(e, s)
 		if err != nil {
