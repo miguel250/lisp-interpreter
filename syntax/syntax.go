@@ -7,7 +7,7 @@ import (
 
 // Sexpr is a S-expression
 type Sexpr interface {
-	expr()
+	Expr()
 	String() string
 }
 
@@ -18,7 +18,8 @@ type ConsExpr struct {
 	Cdr Sexpr
 }
 
-func (*ConsExpr) expr() {}
+// Expr is use to satified Sexpr interface
+func (*ConsExpr) Expr() {}
 func (c *ConsExpr) String() string {
 	return fmt.Sprintf("(cons %s %s)", c.Car, c.Cdr)
 }
@@ -26,7 +27,8 @@ func (c *ConsExpr) String() string {
 // A NilExpr represent a "nil".
 type NilExpr struct{}
 
-func (*NilExpr) expr()          {}
+// Expr is use to satified Sexpr interface
+func (*NilExpr) Expr()          {}
 func (*NilExpr) String() string { return "nil" }
 
 // A SymbolExpr represent the name of a symbol to be able
@@ -36,7 +38,8 @@ type SymbolExpr struct {
 	Name  string
 }
 
-func (*SymbolExpr) expr() {}
+// Expr is use to satified Sexpr interface
+func (*SymbolExpr) Expr() {}
 func (s *SymbolExpr) String() string {
 	var buf bytes.Buffer
 	buf.WriteString(s.Name)
@@ -50,7 +53,8 @@ type AtomExpr struct {
 	Value interface{}
 }
 
-func (*AtomExpr) expr() {}
+// Expr is use to satified Sexpr interface
+func (*AtomExpr) Expr() {}
 func (a *AtomExpr) String() string {
 	var buf bytes.Buffer
 

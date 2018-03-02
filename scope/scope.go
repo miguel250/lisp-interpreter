@@ -65,7 +65,8 @@ type FuncExpr struct {
 	Fn   Function
 }
 
-func (*FuncExpr) expr() {}
+// Expr is use to satified Sexpr interface
+func (*FuncExpr) Expr() {}
 func (f FuncExpr) String() string {
 	return fmt.Sprintf("fn: %s", f.Name)
 }

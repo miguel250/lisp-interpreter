@@ -33,17 +33,17 @@ func TestScope(t *testing.T) {
 			"parent(data: map[{4 x}:atom(2)]) data: map[{4 z}:atom(\"hello\")]",
 		},
 	} {
-		s := newScope(nil)
+		s := NewScope(nil)
 
 		if test.parent != nil {
-			parentScope := newScope(nil)
-			parentScope.set(test.parent.symbol, &test.parent.atom)
-			s = newScope(parentScope)
+			parentScope := NewScope(nil)
+			parentScope.Set(test.parent.symbol, &test.parent.atom)
+			s = NewScope(parentScope)
 		}
 
-		s.set(test.symbol, &test.atom)
+		s.Set(test.symbol, &test.atom)
 
-		expr, err := s.get(test.symbol)
+		expr, err := s.Get(test.symbol)
 
 		if err != nil {
 			t.Error(err)
@@ -57,7 +57,7 @@ func TestScope(t *testing.T) {
 		}
 
 		if test.parent != nil {
-			expr, err := s.get(test.parent.symbol)
+			expr, err := s.Get(test.parent.symbol)
 
 			if err != nil {
 				t.Fatalf("%s", err)
