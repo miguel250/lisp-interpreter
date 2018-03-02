@@ -5,7 +5,7 @@ type Token int8
 
 const (
 	// EOF presents the end of a file
-	EOF token = iota
+	EOF Token = iota
 
 	// INVALID token
 	INVALID
