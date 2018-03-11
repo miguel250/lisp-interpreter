@@ -2,6 +2,8 @@
 
 #### Build and run
 ```bash
+go get github.com/miguel250/lisp-interpreter
+cd $GOPATH/src/github.com/miguel250/lisp-interpreter
 go build
 cat test.lisp | ./lisp-interpreter
 ```
